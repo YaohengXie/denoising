@@ -1,0 +1,41 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.pytest_tmp/
+.test_work/
+.pip_tmp/
+.ruff_cache/
+.venv/
+venv/
+build/
+dist/
+
+# The controlled processed dataset is distributed separately.
+data/**
+!data/README.md
+
+# Generated evaluation outputs and local logs.
+outputs/
+reproduction_runs/
+*.log
+
+# Local editor, operating-system and secret files.
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+.env
+.env.*
+config.local.yaml
+configs/*_local.yaml
+
+# Research data formats must never be added accidentally.
+*.npz
+*.npy
+*.mat
+*.bin
+*.wav
+*.h5
+*.hdf5
+*.zip

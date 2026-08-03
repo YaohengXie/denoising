@@ -1,0 +1,17 @@
+{
+  "purpose": "Documentary environment for the reported thesis experiments",
+  "python": "3.13.12",
+  "pytorch": "2.11.0+cu128",
+  "cuda_runtime": "12.8",
+  "cudnn": "9.19.0",
+  "numpy": "2.4.2",
+  "scipy": "1.17.0",
+  "pyyaml": "6.0.3",
+  "matplotlib": "3.10.8",
+  "pytest": "9.1.1",
+  "operating_system": "Windows 11 64-bit",
+  "gpu": "NVIDIA GeForce RTX 5090 Laptop GPU",
+  "gpu_memory_mib": 24463,
+  "seed": 1337,
+  "bitwise_retraining_determinism_claimed": false
+}

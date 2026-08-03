@@ -1,0 +1,16 @@
+{
+  "selection_rule": "minimum validation total loss among checkpoints with exact mask and S1/S2 identity and SQI MAE no worse than frozen M7",
+  "sqi_noninferiority_tolerance": 0.0,
+  "selected_epoch": 15,
+  "selected_checkpoint": "checkpoints/m143_v2/M001_S01/best_safe.pt",
+  "selected_metrics": {
+    "epoch": 15,
+    "val_loss": 1.0358989817254685,
+    "val_sqi_mae": 0.22979868378709345,
+    "val_m7_sqi_mae": 0.23086064615670374,
+    "val_sqi_improvement": 0.0010619623696102864,
+    "mask_max_abs_vs_m7": 0.0,
+    "s1s2_max_abs_vs_m7": 0.0,
+    "eligible": true
+  }
+}

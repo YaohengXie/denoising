@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ecg-pcg-denoise"
+version = "1.0.0"
+description = "Fixed-checkpoint reproduction of the M14.3-v2 ECG-PCG-IMU thesis experiments"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24",
+  "scipy>=1.10",
+  "PyYAML>=6.0",
+  "matplotlib>=3.7",
+  "torch>=2.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[project.scripts]
+m143-reproduce = "ecg_pcg_denoise.repro.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.setuptools.packages.find]
+where = ["src"]

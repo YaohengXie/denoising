@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "dataset_id": "m143-v2-processed-evaluation-v1",
+  "required_root_name": "data",
+  "manifest_path": "m143_v2_dataset_manifest.json",
+  "manifest_sha256": "8c26c8cbe138934edf0a7dd800987fbfccbc677b7ef85451701631a7289450eb",
+  "required_total_files": 23379,
+  "groups": [
+    {"name": "bsslab_clean_train", "pattern": "windows/bsslab_musan/clean/train/*.npz", "count": 4204},
+    {"name": "bsslab_clean_val", "pattern": "windows/bsslab_musan/clean/val/*.npz", "count": 1078},
+    {"name": "bsslab_clean_test", "pattern": "windows/bsslab_musan/clean/test/*.npz", "count": 1082},
+    {"name": "strict_esc50_test", "pattern": "windows/bsslab_esc50_v2/mixed/test/*.npz", "count": 16230},
+    {"name": "motema_M001_S01", "pattern": "windows/motema_external_m7/windows/M001_S01/*.npz", "count": 171},
+    {"name": "motema_M001_S02", "pattern": "windows/motema_external_m7/windows/M001_S02/*.npz", "count": 189},
+    {"name": "motema_M001_S03", "pattern": "windows/motema_external_m7/windows/M001_S03/*.npz", "count": 205},
+    {"name": "motema_M001_S04", "pattern": "windows/motema_external_m7/windows/M001_S04/*.npz", "count": 181},
+    {"name": "m143_frozen_manifests", "pattern": "manifests/bsslab_m14_imu/**/*", "count": 37},
+    {"name": "strict_esc50_audit", "pattern": "manifests/esc50_strict_audit.json", "count": 1},
+    {"name": "mixed_window_audit", "pattern": "manifests/bsslab_esc50_v2_mixed_audit.json", "count": 1}
+  ]
+}

@@ -1,0 +1,91 @@
+project:
+  name: bsslab_m143_imu_fold3_aligned_calibrated_v2
+  seed: 1337
+
+paths:
+  data_config: configs/bsslab_m141_imu_data_balanced.yaml
+  base_m7_checkpoint: outputs/bsslab_esc50_enhanced_v2_m7_robust_sqi/checkpoints/best.pt
+  output_dir: outputs/bsslab_m143_imu_fold_M001_S03_aligned_calibrated_v2
+
+data:
+  fs_model: 2000
+  window_sec: 4.0
+
+stft:
+  n_fft: 256
+  win_length: 256
+  hop_length: 32
+
+m14_imu:
+  fold: M001_S03
+
+model:
+  name: unet_transformer_ecg_m143_imu_aligned_calibrated_sqi_v2
+  input_channels: 2
+  use_ecg: true
+  use_transformer: true
+  base_channels: 16
+  transformer_layers: 2
+  transformer_heads: 4
+  dropout: 0.1
+  use_imu: false
+  use_imu_aux: true
+  imu_input_channels: 6
+  imu_hidden_channels: 32
+  imu_joint_gate_hidden_channels: 16
+  imu_artifact_gate_bias: -3.0
+  imu_aux_max_sqi_logit_delta: 1.0
+
+training:
+  batch_size: 48
+  epochs: 15
+  lr: 0.0003
+  weight_decay: 0.01
+  num_workers: 0
+  device: auto
+  amp: true
+  gradient_clip: 5.0
+  early_stopping_patience: 4
+  early_stopping_min_delta: 0.00001
+  save_every_epoch: true
+  validation_bsslab_subjects: [9]
+  targets:
+    coupled_artifact_source: local_noise_fraction
+    artifact_gate_positive_floor: 0.15
+    s1s2_confidence_tolerance_ms: 40.0
+  loss:
+    sqi_kind: huber
+    sqi_huber_delta: 0.10
+    sqi: 1.00
+    motion: 0.35
+    coupled_artifact: 1.00
+    reliability: 0.25
+    sqi_confidence: 0.20
+    sqi_confidence_tolerance: 0.10
+    s1s2_confidence: 0.20
+    artifact_type: 0.00
+    mask_preservation: 10.0
+    s1s2_location_preservation: 10.0
+  fallback:
+    modes: [missing, shuffle, shift]
+    missing_weight: 0.25
+    shuffle_weight: 0.50
+    shift_weight: 0.75
+    shift_seconds: [0.128, 0.256, 0.512, 1.024]
+    huber_beta: 0.05
+    sqi_to_base: 1.0
+    mask_to_base: 10.0
+    s1s2_to_base: 10.0
+    reliability_zero: 0.5
+    coupled_artifact_zero: 0.5
+    sqi_delta_zero: 0.5
+    sqi_confidence: 0.20
+    s1s2_confidence: 0.20
+    alignment_margin_weight: 1.0
+    alignment_margin_value: 0.05
+
+evaluation:
+  variant_prefix: m143v2
+  experiment_label: M14.3 strict ESC-50 v2 base
+  calibrate_artifact_threshold: true
+  imu_shift_seconds: 0.512

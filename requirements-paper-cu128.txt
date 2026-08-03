@@ -1,0 +1,9 @@
+# Exact Python package versions recorded for the reported thesis evaluation.
+# The PyTorch CUDA wheel index is required for the +cu128 build.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0+cu128
+numpy==2.4.2
+scipy==1.17.0
+PyYAML==6.0.3
+matplotlib==3.10.8
+pytest==9.1.1

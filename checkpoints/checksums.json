@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "release": "m143-v2-fixed-checkpoint",
+  "files": {
+    "m7_v2_base": {
+      "path": "checkpoints/m7_v2/best.pt",
+      "bytes": 3590523,
+      "sha256": "1ba00aa4b5ca4819a0511b000f0d9aff8ed13e7b505b53320c223972a95f4a33",
+      "source_archive_sha256": "c49190c8f35c034b7d98aec12ee6575e4bc5238d3fe2e81ccc4e39b27d338ae6",
+      "epoch": 8,
+      "val_loss": 0.07206476379137534,
+      "artifact_type": "m7_v2_full_model",
+      "canonical_state_sha256": "88a8a1c02771a6dd693cb43e033511b066d4e7923dd4d9066db188493da1947f"
+    },
+    "M001_S01": {
+      "path": "checkpoints/m143_v2/M001_S01/best_safe.pt",
+      "artifact_type": "m143_v2_imu_aux_adapter",
+      "bytes": 31881,
+      "sha256": "ffc569a9d4ac329c02a1fadac2562b4d18cefed7a4cd81c01d18e8c41bad4aec",
+      "base_checkpoint_sha256": "1ba00aa4b5ca4819a0511b000f0d9aff8ed13e7b505b53320c223972a95f4a33",
+      "source_archive_sha256": "94b4746a34c43437ec152dfdfdae9b7a8f3b266bac9a1e8d6b84e7e3f98a5664",
+      "epoch": 15,
+      "val_loss": 1.0358989817254685,
+      "canonical_adapter_state_sha256": "59d653bd4b9c6b71f7c2e39707c9c38f8c36d3074f88e9f883c84e0de5151b17",
+      "canonical_composed_model_state_sha256": "dc4ffb603f11ec6708e7efe94453efc490bdb4b45bfc45a972e39d58ab0afc23",
+      "selection_summary": {
+        "path": "checkpoints/m143_v2/M001_S01/checkpoint_selection_summary.json",
+        "bytes": 576,
+        "sha256": "2007ed4b85927bbd1ffa1cd26480b3b455ddbd4b4f21134b0827aca3ac7a970c",
+        "selected_epoch": 15
+      }
+    },
+    "M001_S02": {
+      "path": "checkpoints/m143_v2/M001_S02/best_safe.pt",
+      "artifact_type": "m143_v2_imu_aux_adapter",
+      "bytes": 31881,
+      "sha256": "7a90fca7235bf7e9cbedac63456715c182ed4d25a6db11e61658637b809fdbe0",
+      "base_checkpoint_sha256": "1ba00aa4b5ca4819a0511b000f0d9aff8ed13e7b505b53320c223972a95f4a33",
+      "source_archive_sha256": "b0cd9bccd1afa49e25e1e56af6b02d6fde8e092c4b501a123c5ac4b73a1259bf",
+      "epoch": 15,
+      "val_loss": 1.06759911775589,
+      "canonical_adapter_state_sha256": "1fd7b74d1d53c044446948c7abe84a1b97e7c0692ff803874cb99b60b02ec3ae",
+      "canonical_composed_model_state_sha256": "b636272e3c36375c154e3650b05e4e945014a49fbfd07a95f164ff3f9a1af8f2",
+      "selection_summary": {
+        "path": "checkpoints/m143_v2/M001_S02/checkpoint_selection_summary.json",
+        "bytes": 574,
+        "sha256": "3f14aa3c672e1210e076b7d038d96941e802197f057c8aac3ffa6a6908bba800",
+        "selected_epoch": 15
+      }
+    },
+    "M001_S03": {
+      "path": "checkpoints/m143_v2/M001_S03/best_safe.pt",
+      "artifact_type": "m143_v2_imu_aux_adapter",
+      "bytes": 31881,
+      "sha256": "e492fb72eec616a8abc7665ff78ff10fc700602d66ae9d0164d6c865d3f5de6a",
+      "base_checkpoint_sha256": "1ba00aa4b5ca4819a0511b000f0d9aff8ed13e7b505b53320c223972a95f4a33",
+      "source_archive_sha256": "208270b62ac7d891f7c0e385ce5630672a29d3bcbfd7d586c2d39c833c72e7b4",
+      "epoch": 15,
+      "val_loss": 1.0404557901270248,
+      "canonical_adapter_state_sha256": "5b9e2063afd147bc1849f82c66aaa46b7cfd7903efe0bd85a5f78cbc7eaabd38",
+      "canonical_composed_model_state_sha256": "f8f4a50f335ac693fb4517fa05f84ae057eab2784551c4fed4e3f2f408cb6d52",
+      "selection_summary": {
+        "path": "checkpoints/m143_v2/M001_S03/checkpoint_selection_summary.json",
+        "bytes": 575,
+        "sha256": "a819a51c8924f854d9cbb06ba0c4d39b31b55fdf51a608b4297994ef97b7714c",
+        "selected_epoch": 15
+      }
+    },
+    "M001_S04": {
+      "path": "checkpoints/m143_v2/M001_S04/best_safe.pt",
+      "artifact_type": "m143_v2_imu_aux_adapter",
+      "bytes": 31881,
+      "sha256": "e5e5f74d3277996e341652995ad2e6509b6a8f7d2f6d84d9fc09236d18f62cbd",
+      "base_checkpoint_sha256": "1ba00aa4b5ca4819a0511b000f0d9aff8ed13e7b505b53320c223972a95f4a33",
+      "source_archive_sha256": "c339d45fccd4221cf68338680ab5e6dbf324cbf31b82d331bba2d2771121145c",
+      "epoch": 15,
+      "val_loss": 1.0411557923345005,
+      "canonical_adapter_state_sha256": "1ecb5407df16738259f4e96137b8cedfab6780b88af70823f646b217bb573fd5",
+      "canonical_composed_model_state_sha256": "9f45b08bd2de55e2d800ecacedc875583d7a7eca8fe0e1961b3df2f149793a3b",
+      "selection_summary": {
+        "path": "checkpoints/m143_v2/M001_S04/checkpoint_selection_summary.json",
+        "bytes": 576,
+        "sha256": "68fcd4e184fdc1d9b6fedef59b529009ce40b67813b7ebc3c1d992d1ca630986",
+        "selected_epoch": 15
+      }
+    }
+  }
+}

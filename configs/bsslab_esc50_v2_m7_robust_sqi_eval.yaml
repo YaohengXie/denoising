@@ -1,0 +1,35 @@
+project:
+  name: bsslab_esc50_v2_m7_robust_sqi_eval
+  seed: 1337
+
+paths:
+  windows_dir: data/windows/bsslab_esc50_v2
+  output_dir: outputs/bsslab_esc50_v2_m7_robust_sqi_eval
+
+data:
+  fs_model: 2000
+  window_sec: 4.0
+  hop_sec: 2.0
+  train_subjects: [1, 2, 3, 4, 5, 6, 7, 8]
+  val_subjects: [9, 10]
+  test_subjects: [11, 12]
+
+stft:
+  n_fft: 256
+  win_length: 256
+  hop_length: 32
+
+model:
+  name: unet_transformer_ecg_esc50_enhanced_v2_m7_robust_sqi
+  input_channels: 2
+  use_ecg: true
+  use_transformer: true
+  base_channels: 16
+  transformer_layers: 2
+  transformer_heads: 4
+  dropout: 0.1
+
+training:
+  batch_size: 48
+  num_workers: 0
+  device: auto

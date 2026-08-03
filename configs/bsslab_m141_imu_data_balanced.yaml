@@ -1,0 +1,33 @@
+project:
+  name: bsslab_m141_imu_virtual_dataset_balanced
+  seed: 1337
+
+paths:
+  project_root: .
+  clean_windows_dir: data/windows/bsslab_musan/clean
+  motema_windows_dir: data/windows/motema_external_m7/windows
+  m14_manifest_dir: data/manifests/bsslab_m14_imu
+
+data:
+  fs_model: 2000
+  window_sec: 4.0
+  hop_sec: 2.0
+  train_subjects: [1, 2, 3, 4, 5, 6, 7, 8]
+  val_subjects: [9, 10]
+  test_subjects: [11, 12]
+
+stft:
+  n_fft: 256
+  win_length: 256
+  hop_length: 32
+
+m14_imu:
+  default_fold: M001_S01
+  participants: [M001_S01, M001_S02, M001_S03, M001_S04]
+  snr_db: [10, 5, 0, -5, -10]
+  mode_probabilities:
+    motion_artifact: 0.30
+    combined: 0.20
+    independent_artifact: 0.15
+    motion_clean: 0.25
+    clean_identity: 0.10
