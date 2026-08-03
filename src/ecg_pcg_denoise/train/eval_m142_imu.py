@@ -431,8 +431,24 @@ def _load_models(
         if m142.imu_aux_adapter is None:
             raise RuntimeError("M14.3 configuration did not create an IMU auxiliary adapter.")
         m142.imu_aux_adapter.load_state_dict(checkpoint["adapter"], strict=True)
-    else:
+    elif checkpoint.get("artifact_type") == "m143_v2_full_training_checkpoint":
+        expected_fold = str(require_nested(config, "m14_imu.fold"))
+        if checkpoint.get("fold") != expected_fold:
+            raise ValueError(
+                f"Training checkpoint fold {checkpoint.get('fold')!r} does not match "
+                f"configuration fold {expected_fold!r}."
+            )
+        if checkpoint.get("base_checkpoint_sha256") != _sha256(base_path):
+            raise ValueError(
+                "The full M14.3 training checkpoint is not bound to the supplied "
+                "M7 checkpoint."
+            )
         m142.load_state_dict(checkpoint["model"], strict=True)
+    else:
+        raise ValueError(
+            "Unsupported M14.3 checkpoint format; expected a published factorised "
+            "adapter or a bound full training checkpoint."
+        )
     m142.eval()
     if not bool(getattr(m142, "use_imu_aux", False)):
         raise ValueError("The supplied model does not enable model.use_imu_aux.")

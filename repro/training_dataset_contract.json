@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "dataset_id": "m143-v2-processed-training-extension-v1",
+  "scope": "full_training_extension",
+  "required_root_name": "data",
+  "manifest_path": "m143_v2_training_dataset_manifest.json",
+  "manifest_sha256": "0d2a0ef45c8c022f12c3f8303e233310a2ecab82f4df186592f56f2bafcde4bf",
+  "required_total_files": 105640,
+  "required_total_bytes": 13744115616,
+  "composes_with": {
+    "contract_path": "repro/dataset_contract.json",
+    "required_files": 23379,
+    "combined_full_files": 129019
+  },
+  "groups": [
+    {
+      "name": "strict_esc50_train",
+      "pattern": "windows/bsslab_esc50_v2/mixed/train/*.npz",
+      "count": 63060,
+      "required_for": [
+        "full"
+      ]
+    },
+    {
+      "name": "strict_esc50_val",
+      "pattern": "windows/bsslab_esc50_v2/mixed/val/*.npz",
+      "count": 16170,
+      "required_for": [
+        "full"
+      ]
+    },
+    {
+      "name": "enhanced_esc50_train",
+      "pattern": "windows/bsslab_esc50_enhanced_v2/mixed/train/*.npz",
+      "count": 21020,
+      "required_for": [
+        "full"
+      ]
+    },
+    {
+      "name": "enhanced_esc50_val",
+      "pattern": "windows/bsslab_esc50_enhanced_v2/mixed/val/*.npz",
+      "count": 5390,
+      "required_for": [
+        "full"
+      ]
+    }
+  ],
+  "optional_excluded_groups": [
+    {
+      "name": "enhanced_esc50_test",
+      "pattern": "windows/bsslab_esc50_enhanced_v2/mixed/test/*.npz",
+      "expected_count_if_present": 5410,
+      "included_in_manifest": false,
+      "reason": "Historical diagnostic split; not read by the minimum Full training and validation protocol."
+    }
+  ],
+  "privacy": {
+    "public_contract_contains_individual_filenames": false,
+    "sealed_manifest_distribution": "authorised_data_package_only",
+    "paths": "repository-relative POSIX paths below the controlled data root"
+  }
+}

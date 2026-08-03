@@ -1,123 +1,250 @@
-# M14.3-v2 result reproduction
+# M14.3-v2 reproduction and retraining
 
-This repository is the minimal fixed-checkpoint release for the MSc thesis model M14.3-v2: an ECG-assisted PCG denoising system with IMU-assisted signal-quality and reliability outputs. It contains the model/evaluation source, frozen configurations, one M7-v2 base checkpoint, four fold-specific IMU adapters and machine-checkable thesis reference values. It contains no research dataset.
+This repository contains the model, training, validation, evaluation and audit
+source for the MSc thesis system M14.3-v2: ECG-assisted PCG denoising with
+IMU-assisted signal-quality and reliability assessment. It contains the
+published model checkpoints but **no research dataset**.
 
-The immutable release identifier is `m143-v2-repro-v1.0.0`; use that tag rather than a later moving `main` branch when auditing the thesis result.
+The immutable release identifier for this expanded source release is
+`m143-v2-repro-v2.0.0`. Use that tag, rather than a later moving `main` branch,
+when auditing the thesis workflow.
 
-The supported claim is **fixed-checkpoint numerical reproduction**. This repository does not attempt to retrain the complete M0--M14.3 development history. Retraining can produce different epochs and weights even with the same protocol, whereas the workflow below evaluates the archived model state and checks 68 reported quantities.
+## Three scientifically distinct modes
 
-## What is included
+`Fixed`, `Adapter` and `Full` are three workflows around the same final model
+architecture; they are not three competing model architectures.
+
+| Mode | Starting point | What is trained | Required controlled data | Reproduction claim |
+|---|---|---|---|---|
+| **Fixed** | Published M7-v2 and four published M14.3-v2 adapters | Nothing | 23,379-file evaluation package | Re-runs inference and checks 68 thesis quantities within declared tolerances |
+| **Adapter** | Published M7-v2 | Four randomly initialised fold-specific IMU auxiliary adapters; M7 stays frozen | Same 23,379-file evaluation package | Repeats adapter training, safe selection, validation-only calibration and held-out testing |
+| **Full** | M5 and M6 start from new random weights | Complete five-stage M7-v2 chain, then four M14.3-v2 adapters | Evaluation package plus 105,640-file training extension, 129,019 files in total | Repeats the complete declared training, validation, selection, calibration and test protocol |
+
+Only `Fixed` promises numerical agreement with the archived thesis values. The
+original GPU training used AMP and did not force bitwise-deterministic CUDA
+execution, so `Adapter` and `Full` are protocol-level reproductions: checkpoint
+hashes, selected epochs and final decimal values may differ even with the same
+seed and data.
+
+## Model boundary
+
+M7-v2 uses a U-Net encoder/decoder and Transformer bottleneck to process noisy
+PCG together with an ECG-derived timing map. It produces the enhancement mask,
+reconstructed PCG quantities, S1/S2 timing proxies and a base SQI estimate.
+
+M14.3-v2 adds a small `IMUAuxiliaryAdapter`. It receives six IMU features plus
+frozen M7 decoder/ECG context and produces motion, coupled-artifact, reliability
+and confidence outputs together with a bounded SQI correction. It cannot modify
+the denoising mask, reconstructed waveform or S1/S2 locations. During adapter
+training every M7 parameter is frozen and only `imu_aux_adapter.*` is updated.
+
+The public weights are factorised: the complete common M7 state is stored once,
+and each of the four LOSO folds stores only its 30-tensor IMU adapter. The loader
+checks the fold and base-checkpoint binding before composing the complete model.
+
+## Repository contents
 
 ```text
-checkpoints/                 M7-v2 base plus four M14.3-v2 IMU adapters
-configs/                     six frozen evaluation/data configurations
-src/ecg_pcg_denoise/         model, dataset, evaluation and audit code
-repro/                       data contract and 68 golden-result checks
-scripts/                     Windows/Linux one-command wrappers
-tests/                       no-data architecture and checkpoint tests
-data/README.md               controlled-data placement instructions
-environment/                 recorded thesis computing environment
+checkpoints/                 published M7-v2 base and four M14.3-v2 adapters
+configs/                     fixed evaluation, five-stage M7 and four-fold M14.3 configs
+src/ecg_pcg_denoise/
+  models/                    complete M7/M14.3 model definition
+  data/                      online noise/IMU synthesis used by processed-data training
+  train/                     M7 and M14.3 training, selection, validation and reporting
+  repro/                     Fixed workflow and 68-value golden comparison
+  retrain/                   Adapter/Full plan builder and execution runner
+repro/                       public evaluation and training-extension data contracts
+scripts/                     Windows/Linux wrappers, environment capture and manifest tools
+tests/                       data-free architecture, training, integrity and runner tests
+docs/RETRAINING.md           detailed data and retraining boundary
+data/README.md               controlled-data placement and governance instructions
+environment/                 recorded thesis hardware/software environment
 ```
 
-The four M14.3-v2 files contain only the fold-specific IMU auxiliary adapter. The identical M7 state is stored once. The loader verifies the fold and base-checkpoint binding before composing the model. The five public weight files total 3,718,047 bytes (3.55 MiB) without changing any tensor or model output.
+Historical M0--M14.2 experiments, unrelated baselines and raw-data notebooks are
+not required by these three final workflows and are deliberately excluded.
 
-## Prerequisites
+## Installation
 
-- An authorised copy of the **processed frozen evaluation package**, not merely the raw datasets. See [data/README.md](data/README.md).
-- Python 3.10 or later. The paper run used Python 3.13.12 and PyTorch 2.11.0+cu128.
-- A CUDA-capable GPU is recommended. CPU evaluation is supported but substantially slower.
-
-For the closest match to the paper environment:
+Python 3.10 or later is required. The reported run used Python 3.13.12,
+PyTorch 2.11.0+cu128, CUDA 12.8 and an RTX 5090 Laptop GPU.
 
 ```powershell
 py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements-paper-cu128.txt
-python -m pip install -e .
+python -m pip install -e ".[dev]"
+python -m pytest -q
 ```
 
-The exact recorded software and hardware versions are in [paper_environment.json](environment/paper_environment.json). A different supported PyTorch/CUDA build may be used, but the published tolerances are not a promise of identical behaviour on every platform.
+The exact recorded environment is in
+[`environment/paper_environment.json`](environment/paper_environment.json).
+A compatible CPU build can execute the code, but training and complete
+evaluation will be substantially slower.
 
-## Place the controlled data
+## Controlled processed data
 
-After access has been approved, copy the supplied directory to `data/` without renaming its internal folders:
+After approval, place the supplied root at `data/` or pass its absolute path.
+The root directory itself must remain named `data`, because the frozen pair CSV
+files use relative paths beginning with `data/windows/`.
+
+### Fixed and Adapter package
 
 ```text
-denoising/
-  data/
-    m143_v2_dataset_manifest.json
-    windows/...
-    manifests/...
+data/
+  m143_v2_dataset_manifest.json
+  windows/
+    bsslab_musan/clean/{train,val,test}/
+    bsslab_esc50_v2/mixed/test/
+    motema_external_m7/windows/M001_S01...M001_S04/
+  manifests/
+    bsslab_m14_imu/
+    esc50_strict_audit.json
+    bsslab_esc50_v2_mixed_audit.json
 ```
 
-The committed public contract binds the supplied manifest to SHA-256:
+This package contains 23,379 manifested files and is bound by
+[`repro/dataset_contract.json`](repro/dataset_contract.json).
+
+### Additional Full-training extension
 
 ```text
-8c26c8cbe138934edf0a7dd800987fbfccbc677b7ef85451701631a7289450eb
+data/
+  m143_v2_training_dataset_manifest.json
+  windows/
+    bsslab_esc50_v2/mixed/{train,val}/
+    bsslab_esc50_enhanced_v2/mixed/{train,val}/
 ```
 
-The runner then verifies all 23,379 required files and every frozen clean/IMU pairing before inference. A dataset at another location can be passed with `-DataRoot` or `--data-root`, but the supplied root directory itself must remain named `data` because the frozen CSV paths begin with `data/windows/` (for example, `D:\approved_package\data`).
+The extension contains 105,640 files (13,744,115,616 bytes). Its private
+per-file manifest is bound by
+[`repro/training_dataset_contract.json`](repro/training_dataset_contract.json)
+with SHA-256:
 
-## Reproduce the paper results
+```text
+0d2a0ef45c8c022f12c3f8303e233310a2ecab82f4df186592f56f2bafcde4bf
+```
 
-Windows PowerShell:
+Raw BSSLAB, ESC-50 and MotemaSens files are not required for these workflows.
+The supplied inputs are already filtered, windowed, split, leakage-audited and,
+where applicable, manually aligned. See [`data/README.md`](data/README.md) and
+[`docs/RETRAINING.md`](docs/RETRAINING.md) for the exact contract.
+
+## Fixed: reproduce the archived thesis results
+
+Windows:
 
 ```powershell
-.\scripts\reproduce_m143_v2.ps1
+.\scripts\reproduce_m143_v2.ps1 -DataRoot "D:\approved_package\data"
 ```
 
-Linux/macOS shell:
+Linux/macOS:
 
 ```bash
-bash scripts/reproduce_m143_v2.sh
+bash scripts/reproduce_m143_v2.sh --data-root /approved/package/data
 ```
 
-The wrapper records the runtime environment, runs 29 no-data tests, validates checkpoints and controlled data, and executes the 22-step protocol:
+This executes 22 scientific commands: strict M7 evaluation, four M14.3-v2 LOSO
+folds with validation-only calibration and temporal-shift tests, strict report
+generation, canonical extraction and 68 machine-readable golden checks. A
+no-data plan check is available with `-DryRun` or `--dry-run`.
 
-1. M7-v2 strict ESC-50 evaluation.
-2. Four M14.3-v2 LOSO folds, each with validation-only calibration, ordinary testing and three additional IMU time-shift tests.
-3. Leakage-audited strict report generation.
-4. Canonical result extraction and 68 golden-value checks.
+## Adapter: retrain only the four IMU auxiliary adapters
 
-On the thesis computer (RTX 5090 Laptop GPU), the complete checked run took approximately 13 minutes. Outputs are written to a new timestamped directory under `reproduction_runs/`. The decisive files are:
-
-```text
-reproduction_status.json       overall pass/fail and terminal stage
-checkpoint_integrity_report.json
-dataset_integrity_report.json
-canonical_actual_results.json  newly calculated canonical metrics
-golden_comparison_report.json  all 68 comparisons and tolerances
-command_provenance.json        exact executed commands
-logs/                          stdout/stderr for every evaluation command
-```
-
-A no-data plan check is available before the controlled package is obtained:
+Windows:
 
 ```powershell
-.\scripts\reproduce_m143_v2.ps1 -DryRun
+.\scripts\retrain_m143_v2.ps1 `
+  -Scope Adapter `
+  -DataRoot "D:\approved_package\data"
 ```
 
-## Expected headline results
+Linux/macOS:
 
-| Evaluation population | Quantity | Reference |
+```bash
+bash scripts/retrain_m143_v2.sh \
+  --scope adapter \
+  --data-root /approved/package/data
+```
+
+The runner verifies the published weights and evaluation package, evaluates the
+published M7 base, then performs 30 ordered scientific commands. For each fold
+it trains a new adapter, applies the hard safe-checkpoint gates, calibrates only
+on validation participant 10, tests on held-out BSSLAB participants 11--12 and
+runs the required IMU time-shift tests.
+
+## Full: retrain M7-v2 and M14.3-v2 from new weights
+
+Windows:
+
+```powershell
+.\scripts\retrain_m143_v2.ps1 `
+  -Scope Full `
+  -DataRoot "D:\approved_package\data"
+```
+
+Linux/macOS:
+
+```bash
+bash scripts/retrain_m143_v2.sh \
+  --scope full \
+  --data-root /approved/package/data
+```
+
+The 35-command Full plan is:
+
+1. train M5 from a new random initialisation;
+2. train M6 multitask independently from a new random initialisation;
+3. initialise M7 distillation from the new M6 and use the new M5 as teacher;
+4. robustly fine-tune M7 on Enhanced-v2 mixtures;
+5. fine-tune only the SQI head to obtain the new M7-v2 base;
+6. evaluate that new base on the strict held-out test set;
+7. train, safely select, calibrate and test four M14.3-v2 LOSO adapters;
+8. run the required temporal-shift tests and generate the strict report.
+
+Before training, Full verifies both controlled manifests and hashes every one of
+the 129,019 sealed inputs. The newly trained M7 is then bound into every fold;
+the published M7 checkpoint is not used as a training initialisation.
+
+Both retraining scopes support a no-data plan check:
+
+```powershell
+.\scripts\retrain_m143_v2.ps1 -Scope Adapter -DryRun
+.\scripts\retrain_m143_v2.ps1 -Scope Full -DryRun
+```
+
+Every run writes to a new timestamped directory under `retraining_runs/` and
+never overwrites the published checkpoints. It records runtime configurations,
+environment details, command logs, training histories, selected checkpoints,
+calibration files, test results, the strict report and a descriptive comparison
+with the archived thesis values.
+
+## Fixed reference values
+
+| Evaluation population | Quantity | Archived value |
 |---|---:|---:|
-| Strict ESC-50 M7-v2, 16,230 windows | ΔSNR | 13.7633 dB |
-|  | ΔSI-SDR | 12.8533 dB |
+| Strict ESC-50 M7-v2, 16,230 windows | Delta SNR | 13.7633 dB |
+|  | Delta SI-SDR | 12.8533 dB |
 |  | Correlation | 0.945903 |
 |  | Log-spectral distance | 0.013302 |
 |  | SQI MAE | 0.234122 |
 |  | S1/S2 MAE | 0.134135 |
-| Synthetic-IMU LOSO, 3,667 noisy fold-windows | M14.3-v2 SQI MAE | 0.244726 |
+| Synthetic-IMU LOSO, 3,667 noisy fold windows | M14.3-v2 SQI MAE | 0.244726 |
 |  | SQI MAE improvement over M7 | 0.001003 |
 |  | Artifact AUROC | 0.851594 |
 |  | Artifact AUPRC | 0.939972 |
 |  | Maximum protected-output difference from M7 | 0.0 |
 
-The two populations in this table are different and must not be compared as if they were a paired benchmark. Within the M14.3-v2 LOSO evaluation, the denoising waveform, mask and S1/S2 locations are intentionally identical to M7. The evidence supports IMU-assisted SQI/reliability assessment, **not** an IMU-driven improvement in denoising.
+The strict M7 population and synthetic-IMU LOSO population are different and
+must not be treated as a paired comparison. The evidence supports IMU-assisted
+quality/reliability assessment, not an IMU-driven improvement in denoising.
 
-Numerical acceptance uses the explicit per-field rules in [expected_results.json](repro/expected_results.json), generally `1e-4` absolute plus `1e-4` relative tolerance; identifiers and counts are exact, and protected outputs use `1e-7` absolute tolerance.
+## Responsible use
 
-## Scope and responsible use
-
-This is research software for academic reproduction and offline method audit. It is not a medical device and must not be used for diagnosis, triage, treatment decisions or unsupervised clinical monitoring. Checkpoints contain model tensors and provenance only; they contain no raw participant signals. Access to data remains governed by the original approvals, agreements and deletion/redistribution conditions. See [MODEL_CARD.md](MODEL_CARD.md) for model limitations.
+This is academic research software, not a medical device. It must not be used
+for diagnosis, triage, treatment decisions or unsupervised clinical monitoring.
+The public checkpoints contain model tensors and provenance only; they contain
+no participant waveforms. Data access remains governed by the original ethics,
+participant-information, data-owner, access-expiry and deletion conditions.
+See [`MODEL_CARD.md`](MODEL_CARD.md) for limitations.

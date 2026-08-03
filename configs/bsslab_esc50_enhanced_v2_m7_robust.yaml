@@ -1,0 +1,75 @@
+project:
+  name: bsslab_esc50_enhanced_v2_m7_robust
+  seed: 1337
+
+paths:
+  raw_bsslab_dir: data/raw/bsslab
+  manifest_csv: data/manifests/bsslab_manifest.csv
+  processed_dir: data/processed/bsslab_npz
+  clean_windows_dir: data/windows/bsslab_musan/clean
+  windows_dir: data/windows/bsslab_esc50_enhanced_v2
+  external_noise_dir: data/external_noise
+  output_dir: outputs/bsslab_esc50_enhanced_v2_m7_robust
+
+data:
+  fs_model: 2000
+  window_sec: 4.0
+  hop_sec: 2.0
+  train_subjects: [1, 2, 3, 4, 5, 6, 7, 8]
+  val_subjects: [9, 10]
+  test_subjects: [11, 12]
+
+preprocessing:
+  pcg_filter:
+    highpass_hz: 20.0
+    lowpass_hz: 800.0
+  ecg_filter:
+    highpass_hz: 0.5
+    lowpass_hz: 40.0
+  normalize: robust
+
+stft:
+  n_fft: 256
+  win_length: 256
+  hop_length: 32
+
+noise:
+  snr_db: [10, 5, 0, -5, -10]
+  examples_per_clean_window: 1
+  split_directories:
+    train:
+      esc50: data/external_noise/esc50_strict/train
+    val:
+      esc50: data/external_noise/esc50_strict/val
+    test:
+      esc50: data/external_noise/esc50_strict/test
+
+enhanced:
+  levels: [mild, moderate, severe]
+  level_probabilities: [0.35, 0.45, 0.20]
+
+model:
+  name: unet_transformer_ecg_esc50_enhanced_v2_m7_robust
+  input_channels: 2
+  use_ecg: true
+  use_transformer: true
+  base_channels: 16
+  transformer_layers: 2
+  transformer_heads: 4
+  dropout: 0.1
+
+training:
+  batch_size: 8
+  epochs: 10
+  lr: 0.00001
+  num_workers: 0
+  device: auto
+  init_checkpoint: outputs/bsslab_esc50_v2_m7_distill/checkpoints/best.pt
+  loss:
+    waveform_l1: 1.0
+    mag_l1: 1.0
+    s1s2_weighted_waveform_l1: 0.5
+    s1s2_weighted_mag_l1: 0.5
+    s1s2_weight_alpha: 3.0
+    s1s2_bce: 0.05
+    sqi_mse: 0.02

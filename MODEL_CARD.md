@@ -1,6 +1,6 @@
 # Model card: M14.3-v2
 
-Release: `m143-v2-repro-v1.0.0` (package version 1.0.0).
+Release: `m143-v2-repro-v2.0.0` (package version 2.0.0).
 
 ## Model summary
 
@@ -27,6 +27,7 @@ These results do not show that IMU improves denoising. They show a small SQI imp
 ## Intended use
 
 - Academic result reproduction.
+- Protocol-level retraining from the separately authorised processed inputs.
 - Offline algorithm audit and ablation analysis.
 - Research on ECG-assisted PCG enhancement and IMU-assisted quality assessment.
 
@@ -44,6 +45,7 @@ These results do not show that IMU improves denoising. They show a small SQI imp
 - Generalisation across sensors, acquisition sites, pathologies and demographic groups has not been clinically established.
 - ECG or IMU absence, timing error and device-domain shift can affect auxiliary outputs; temporal-shift tests characterise only selected perturbations.
 - Fixed-checkpoint evaluation can be numerically checked within declared tolerances. From-scratch retraining is not expected to reproduce identical checkpoint bytes, selected epochs or every decimal.
+- The Adapter and Full runners reproduce declared training protocols, not a bitwise-deterministic training process; only the Fixed workflow is governed by the 68-value numerical acceptance contract.
 
 ## Ethical and data considerations
 

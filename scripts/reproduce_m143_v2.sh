@@ -45,6 +45,9 @@ export PYTHONPATH="$REPOSITORY_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 if [[ "$DATA_ROOT" != /* ]]; then
   DATA_ROOT="$REPOSITORY_ROOT/$DATA_ROOT"
 fi
+DATA_ROOT="$("$PYTHON_BIN" -c \
+  'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve())' \
+  "$DATA_ROOT")"
 if [[ "$(basename "$DATA_ROOT")" != "data" ]]; then
   echo "--data-root must name the supplied data directory: $DATA_ROOT" >&2
   exit 1
@@ -58,6 +61,9 @@ if [[ -z "$RUN_ROOT" ]]; then
 elif [[ "$RUN_ROOT" != /* ]]; then
   RUN_ROOT="$REPOSITORY_ROOT/$RUN_ROOT"
 fi
+RUN_ROOT="$("$PYTHON_BIN" -c \
+  'from pathlib import Path; import sys; print(Path(sys.argv[1]).resolve())' \
+  "$RUN_ROOT")"
 case "$RUN_ROOT" in
   "$DATA_ROOT"|"$DATA_ROOT"/*)
     echo "Run root must be outside the read-only data directory." >&2

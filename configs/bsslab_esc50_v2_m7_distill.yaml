@@ -1,0 +1,52 @@
+project:
+  name: bsslab_esc50_v2_m7_distill
+  seed: 1337
+
+paths:
+  raw_bsslab_dir: data/raw/bsslab
+  manifest_csv: data/manifests/bsslab_manifest.csv
+  processed_dir: data/processed/bsslab_npz
+  windows_dir: data/windows/bsslab_esc50_v2
+  output_dir: outputs/bsslab_esc50_v2_m7_distill
+
+data:
+  fs_model: 2000
+  window_sec: 4.0
+  hop_sec: 2.0
+  train_subjects: [1, 2, 3, 4, 5, 6, 7, 8]
+  val_subjects: [9, 10]
+  test_subjects: [11, 12]
+
+stft:
+  n_fft: 256
+  win_length: 256
+  hop_length: 32
+
+model:
+  name: unet_transformer_ecg_esc50_v2_m7_distill
+  input_channels: 2
+  use_ecg: true
+  use_transformer: true
+  base_channels: 16
+  transformer_layers: 2
+  transformer_heads: 4
+  dropout: 0.1
+
+training:
+  batch_size: 8
+  epochs: 15
+  lr: 0.00003
+  num_workers: 0
+  device: auto
+  early_stopping_patience: 5
+  early_stopping_min_delta: 0.00001
+  init_checkpoint: outputs/bsslab_esc50_v2_m6_multitask/checkpoints/best.pt
+  teacher_checkpoint: outputs/bsslab_esc50_v2_m5/checkpoints/best.pt
+  loss:
+    waveform_l1: 1.0
+    mag_l1: 1.0
+    s1s2_bce: 0.05
+    sqi_mse: 0.02
+    teacher_mask_l1: 5.0
+    teacher_mag_l1: 2.0
+    teacher_waveform_l1: 1.0

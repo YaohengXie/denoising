@@ -1,5 +1,7 @@
 [CmdletBinding()]
 param(
+    [ValidateSet("Adapter", "Full")]
+    [string]$Scope = "Adapter",
     [string]$DataRoot = "data",
     [string]$RunRoot = "",
     [string]$Python = "python",
@@ -60,7 +62,7 @@ try {
     }
     if ([string]::IsNullOrWhiteSpace($RunRoot)) {
         $Stamp = [DateTime]::UtcNow.ToString("yyyyMMdd_HHmmss")
-        $RunRoot = Join-Path "reproduction_runs" $Stamp
+        $RunRoot = Join-Path "retraining_runs" ("{0}_{1}" -f $Scope.ToLowerInvariant(), $Stamp)
     }
     $RunRootPath = Resolve-PythonPath ([System.IO.Path]::GetFullPath(
         [System.IO.Path]::Combine($RepositoryRoot, $RunRoot)
@@ -74,7 +76,7 @@ try {
     }
     New-Item -ItemType Directory -Force -Path $RunRootPath | Out-Null
 
-    Write-Host "M14.3-v2 fixed-checkpoint reproduction" -ForegroundColor Green
+    Write-Host "M14.3-v2 $Scope protocol retraining" -ForegroundColor Green
     Write-Host "Repository: $RepositoryRoot"
     Write-Host "Data root: $DataRootPath"
     Write-Host "Run root: $RunRootPath"
@@ -83,19 +85,21 @@ try {
         --output (Join-Path $RunRootPath "environment.json")
     Invoke-Python -m pytest -q -p no:cacheprovider
 
-    $RunArguments = @(
-        "-m", "ecg_pcg_denoise.repro", "run",
+    $Arguments = @(
+        "-m", "ecg_pcg_denoise.retrain",
+        "--scope", $Scope.ToLowerInvariant(),
         "--data-root", $DataRootPath,
-        "--run-root", $RunRootPath
+        "--run-root", $RunRootPath,
+        "--python", $Python
     )
     if (-not [string]::IsNullOrWhiteSpace($Device)) {
-        $RunArguments += @("--device", $Device)
+        $Arguments += @("--device", $Device)
     }
     if ($DryRun) {
-        $RunArguments += "--dry-run"
+        $Arguments += "--dry-run"
     }
-    Invoke-Python @RunArguments
-    Write-Host "M14.3-v2 reproduction completed." -ForegroundColor Green
+    Invoke-Python @Arguments
+    Write-Host "M14.3-v2 $Scope retraining workflow completed." -ForegroundColor Green
 }
 finally {
     Pop-Location

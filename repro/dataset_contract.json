@@ -3,7 +3,7 @@
   "dataset_id": "m143-v2-processed-evaluation-v1",
   "required_root_name": "data",
   "manifest_path": "m143_v2_dataset_manifest.json",
-  "manifest_sha256": "8c26c8cbe138934edf0a7dd800987fbfccbc677b7ef85451701631a7289450eb",
+  "manifest_sha256": "1ef353fe40b6189ca38196f1cc07eea9bbfd360c3fa7c03203ead7890b6262e5",
   "required_total_files": 23379,
   "groups": [
     {"name": "bsslab_clean_train", "pattern": "windows/bsslab_musan/clean/train/*.npz", "count": 4204},
