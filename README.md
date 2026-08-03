@@ -6,7 +6,7 @@ IMU-assisted signal-quality and reliability assessment. It contains the
 published model checkpoints but **no research dataset**.
 
 The immutable release identifier for this expanded source release is
-`m143-v2-repro-v2.0.1`. Use that tag, rather than a later moving `main` branch,
+`m143-v2-repro-v2.0.2`. Use that tag, rather than a later moving `main` branch,
 when auditing the thesis workflow.
 
 ## Three scientifically distinct modes
@@ -222,6 +222,79 @@ with the archived thesis values.
 
 The generated examiner-facing report is written in British academic English to
 `reports/strict_esc50_m143_v2/report.md`.
+
+## After a run: find, visualise and interpret the results
+
+The wrapper prints the absolute run directory in its final status line. Results
+are never written into the public checkpoint directories. The examples below
+assume the explicit run names used in this README; substitute the directory
+printed by the wrapper if a timestamped default was used.
+
+### Fixed result acceptance
+
+For a run at `reproduction_runs/examiner_fixed`, the decisive files are:
+
+| Artefact | Purpose |
+|---|---|
+| `reproduction_status.json` | Overall terminal state and the stage reached |
+| `golden_comparison_report.json` | All 68 comparisons with the archived thesis values |
+| `canonical_actual_results.json` | Metrics recalculated by the current run |
+| `reports/strict_esc50_m143_v2/report.md` | English narrative report with embedded figures |
+| `reports/strict_esc50_m143_v2/figures/` | Four publication-ready result visualisations |
+| `reports/strict_esc50_m143_v2/data/` | Overall, by-SNR, fold, identity and timing-shift CSV/JSON tables |
+| `command_provenance.json` and `logs/` | Exact commands and per-command stdout/stderr |
+
+On Windows, inspect the machine-readable acceptance state with:
+
+```powershell
+$Run = "reproduction_runs\examiner_fixed"
+$Status = Get-Content "$Run\reproduction_status.json" -Raw | ConvertFrom-Json
+$Golden = Get-Content "$Run\golden_comparison_report.json" -Raw | ConvertFrom-Json
+$Status | Select-Object status, stage, exit_code
+$Golden.details | Select-Object checks_total, checks_passed, checks_failed
+```
+
+The required Fixed outcome is `status=pass`,
+`stage=golden_result_comparison`, `exit_code=0`, and 68/68 checks passed.
+Open the English report and its visualisations with:
+
+```powershell
+Invoke-Item "$Run\reports\strict_esc50_m143_v2\report.md"
+Invoke-Item "$Run\reports\strict_esc50_m143_v2\figures"
+```
+
+The four figures show strict M7 denoising overall/by SNR, protected-output
+identity, fold-wise SQI comparison, and IMU alignment/counterfactual behaviour.
+
+### Adapter and Full result acceptance
+
+For `retraining_runs/examiner_adapter` or `retraining_runs/examiner_full`, set
+`$Run` to the relevant directory and inspect:
+
+| Artefact | Purpose |
+|---|---|
+| `retraining_status.json` | Protocol-level terminal state |
+| `canonical_retrained_results.json` | Metrics calculated from the newly trained checkpoints |
+| `reference_difference_report.json` | Descriptive comparison with the archived Fixed values |
+| `reports/strict_esc50_m143_v2/report.md` | English retraining report with the same four visualisations |
+| `outputs/` | Training histories, selected checkpoints, calibration and test outputs |
+| `command_provenance.json` and `logs/` | Complete executable audit trail |
+
+```powershell
+$Run = "retraining_runs\examiner_adapter"  # or examiner_full
+$Status = Get-Content "$Run\retraining_status.json" -Raw | ConvertFrom-Json
+$Status | Select-Object status, stage, exit_code
+Invoke-Item "$Run\reports\strict_esc50_m143_v2\report.md"
+Invoke-Item "$Run\reports\strict_esc50_m143_v2\figures"
+```
+
+The required protocol outcome is `status=pass`, `stage=protocol_complete` and
+`exit_code=0`. `reference_difference_report.json` deliberately has top-level
+`status=not_enforced`: stochastic Adapter/Full retraining is not required to
+reproduce the archived checkpoint hash, selected epoch or every reported
+decimal. This is not a failed run. If `report.md` is absent, the protocol did
+not reach report generation; read `retraining_status.json` and the latest file
+under `logs/` before attempting another run directory.
 
 ## Fixed reference values
 

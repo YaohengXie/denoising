@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ecg-pcg-denoise"
-version = "2.0.1"
+version = "2.0.2"
 description = "Fixed evaluation and protocol retraining of the M14.3-v2 ECG-PCG-IMU thesis system"
 readme = "README.md"
 requires-python = ">=3.10"

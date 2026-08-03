@@ -1,6 +1,6 @@
 # Model card: M14.3-v2
 
-Release: `m143-v2-repro-v2.0.1` (package version 2.0.1).
+Release: `m143-v2-repro-v2.0.2` (package version 2.0.2).
 
 ## Model summary
 
