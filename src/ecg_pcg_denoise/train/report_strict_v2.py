@@ -1057,36 +1057,40 @@ def _write_report(
         )
         for row in folds
     )
-    report = f"""# Strict ESC-50 v2 与 M14.3-v2 结果汇总
+    report = f"""# Strict ESC-50 v2 and M14.3-v2 Evaluation Report
 
-## 结论
+## Executive summary
 
-本报告仅在 ESC-50 严格分割和四折 M14.3-v2 结果全部存在、且两份
-leakage audit 均为 `pass` 时生成。ESC-50 的 source group、文件哈希和
-scale-normalised fingerprint 跨集合重叠均为 0。
+This report is generated only after the strict ESC-50 evaluation, all four
+M14.3-v2 folds and both leakage audits are available. Both audits passed. The
+cross-split overlap counts for ESC-50 source groups, exact file hashes and
+scale-normalised fingerprints were all zero.
 
-M7-robust-SQI-v2 在严格 ESC-50 测试集上的窗口均值为：
-ΔSNR `{float(m7['delta_snr']):.4f}` dB、ΔSI-SDR
-`{float(m7['delta_si_sdr']):.4f}` dB、Corr
-`{float(m7['corr_estimate']):.5f}`、LSD
-`{float(m7['log_spectral_distance']):.5f}`。
+On the strict ESC-50 test population, the window-mean M7-robust-SQI-v2 results
+were ΔSNR `{float(m7['delta_snr']):.4f}` dB, ΔSI-SDR
+`{float(m7['delta_si_sdr']):.4f}` dB, correlation
+`{float(m7['corr_estimate']):.5f}` and log-spectral distance
+`{float(m7['log_spectral_distance']):.5f}`.
 
-在合成 IMU LOSO 测试上，M14.3-v2 相对 M7 的 mask、去噪波形及
-S1/S2 location 最大绝对差为 `{identity:.2e}`。SQI MAE 的四折宏平均
-改善为 `{sqi_gain:+.6f}`。artifact AUROC/AUPRC 的四折宏平均为
+On the synthetic-IMU LOSO test population, the maximum absolute difference
+between M14.3-v2 and M7 in the protected mask, denoised waveform and S1/S2
+location outputs was `{identity:.2e}`. The fold-macro improvement in SQI MAE
+was `{sqi_gain:+.6f}`. Fold-macro artefact AUROC/AUPRC were
 `{float(m143['artifact_auroc_fold_macro']):.4f}` /
-`{float(m143['artifact_auprc_fold_macro']):.4f}`；正确 IMU 相对
-512 ms shift 与 shuffle 的 artifact score 优势分别为
-`{float(m143['correct_minus_shift_artifact_probability_fold_macro']):+.4f}` 和
-`{float(m143['correct_minus_shuffle_artifact_probability_fold_macro']):+.4f}`。
+`{float(m143['artifact_auprc_fold_macro']):.4f}`. Correctly aligned IMU produced
+artefact-score advantages of
+`{float(m143['correct_minus_shift_artifact_probability_fold_macro']):+.4f}` over
+a 512 ms shift and
+`{float(m143['correct_minus_shuffle_artifact_probability_fold_macro']):+.4f}`
+over shuffled correspondence.
 
-## M7 严格 ESC-50 去噪
+## M7 strict ESC-50 denoising
 
 ![M7 strict ESC-50](figures/fig01_m7_esc50_denoising.png)
 
-## M14.3-v2 四折结果
+## Four-fold M14.3-v2 results
 
-| Fold | 窗口数 | ΔSNR | ΔSI-SDR | M7 SQI MAE | M14.3 SQI MAE | SQI改善 | 最大identity差 |
+| Fold | Windows | ΔSNR | ΔSI-SDR | M7 SQI MAE | M14.3 SQI MAE | SQI improvement | Maximum identity difference |
 |---|---:|---:|---:|---:|---:|---:|---:|
 {fold_lines}
 
@@ -1096,17 +1100,21 @@ S1/S2 location 最大绝对差为 `{identity:.2e}`。SQI MAE 的四折宏平均
 
 ![Artifact alignment](figures/fig04_artifact_alignment_counterfactual.png)
 
-## 解释边界
+## Interpretation boundaries
 
-- ESC-50 strict test 与 M14.3 synthetic IMU LOSO test 是不同测试总体，
-  不能把两组绝对数值作配对比较。
-- 四个 LOSO fold 改变的是 held-out Motema IMU ID；BSSLAB 测试窗口会在
-  各 fold 中重复，因此不能将四折行数当作独立 BSSLAB 样本数。
-- M14.3-v2 的 IMU 不改变 mask、waveform 或 S1/S2 location；它只影响
-  SQI residual 与辅助置信度/运动/伪影/IMU有效性输出。
-- 本报告没有把真实 Motema task condition 当作人工 artifact ground truth。
+- The strict ESC-50 test and synthetic-IMU LOSO test are different evaluation
+  populations. Their absolute metrics must not be interpreted as a paired
+  comparison between M7 and M14.3-v2.
+- The held-out MotemaSens IMU participant changes across the four LOSO folds,
+  whereas BSSLAB test windows recur across folds. Summed fold rows therefore do
+  not represent independent BSSLAB observations.
+- IMU does not alter the M14.3-v2 mask, denoised waveform or S1/S2 locations.
+  It affects only the SQI residual and auxiliary confidence, motion, artefact
+  and IMU-validity outputs.
+- Real MotemaSens task conditions are not treated as manually annotated
+  artefact ground truth in this report.
 
-## 可复核表格
+## Auditable data products
 
 - `data/overall_summary.csv`
 - `data/m7_by_snr.csv`
@@ -1117,7 +1125,7 @@ S1/S2 location 最大绝对差为 `{identity:.2e}`。SQI MAE 的四折宏平均
 - `data/m143_artifact_lag.csv`
 - `data/analysis_summary.json`
 """
-    (report_root / "report_zh.md").write_text(report, encoding="utf-8")
+    (report_root / "report.md").write_text(report, encoding="utf-8")
 
 
 def build_report(

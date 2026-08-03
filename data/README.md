@@ -33,7 +33,7 @@ data/
 
 The root directory must itself be named `data`, including when it is stored outside the repository (for example, `D:\approved_package\data`). This requirement keeps the relative paths embedded in the frozen pair CSV files unambiguous.
 
-The evaluation package contains 23,379 manifested files (2,660,960,256 bytes
+The evaluation package contains 23,379 manifested files (2,660,960,090 bytes
 in the frozen release). Its manifest SHA-256 must be:
 
 ```text

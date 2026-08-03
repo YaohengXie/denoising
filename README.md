@@ -6,7 +6,7 @@ IMU-assisted signal-quality and reliability assessment. It contains the
 published model checkpoints but **no research dataset**.
 
 The immutable release identifier for this expanded source release is
-`m143-v2-repro-v2.0.0`. Use that tag, rather than a later moving `main` branch,
+`m143-v2-repro-v2.0.1`. Use that tag, rather than a later moving `main` branch,
 when auditing the thesis workflow.
 
 ## Three scientifically distinct modes
@@ -219,6 +219,9 @@ never overwrites the published checkpoints. It records runtime configurations,
 environment details, command logs, training histories, selected checkpoints,
 calibration files, test results, the strict report and a descriptive comparison
 with the archived thesis values.
+
+The generated examiner-facing report is written in British academic English to
+`reports/strict_esc50_m143_v2/report.md`.
 
 ## Fixed reference values
 

@@ -9,6 +9,7 @@ from ecg_pcg_denoise.train.report_strict_v2 import (
     _find_variant,
     _paired_difference,
     _require_columns,
+    _write_report,
     build_report,
 )
 
@@ -84,3 +85,42 @@ def test_missing_inputs_do_not_create_report() -> None:
             report_root=report_root,
         )
     assert not report_root.exists()
+
+
+def test_examiner_report_is_written_in_english(tmp_path: Path) -> None:
+    summary = {
+        "m7_strict_esc50": {
+            "delta_snr": 13.7,
+            "delta_si_sdr": 12.8,
+            "corr_estimate": 0.94,
+            "log_spectral_distance": 0.013,
+        },
+        "m143_synthetic_loso": {
+            "identity_max_abs_across_folds": 0.0,
+            "sqi_improvement_vs_m7_fold_macro": 0.001,
+            "artifact_auroc_fold_macro": 0.85,
+            "artifact_auprc_fold_macro": 0.94,
+            "correct_minus_shift_artifact_probability_fold_macro": 0.09,
+            "correct_minus_shuffle_artifact_probability_fold_macro": 0.11,
+        },
+    }
+    folds = [
+        {
+            "fold": "M001_S01",
+            "test_windows": 1082,
+            "m143_delta_snr": 3.2,
+            "m143_delta_si_sdr": 3.6,
+            "m7_sqi_mae": 0.24,
+            "m143_sqi_mae": 0.23,
+            "sqi_improvement_vs_m7": 0.01,
+            "identity_max_abs_vs_m7": 0.0,
+        }
+    ]
+
+    _write_report(tmp_path, summary, folds)
+
+    report = (tmp_path / "report.md").read_text(encoding="utf-8")
+    assert "Executive summary" in report
+    assert "Interpretation boundaries" in report
+    assert "Four-fold M14.3-v2 results" in report
+    assert not (tmp_path / "report_zh.md").exists()
